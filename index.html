@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DashJS Video Player</title>
+    <link rel="stylesheet" href="src/main.css">
+</head>
+<body>
+    <div class="container">
+        <h1>DashJS Video Player</h1>
+        <video id="videoPlayer" controls></video>
+        <div class="controls">
+            <input type="text" id="manifestUrl" placeholder="Enter DASH manifest URL" 
+                   value="https://dash.akamaized.net/akamai/bbb_30fps/bbb_30fps.mpd">
+            <button onclick="loadVideo()">Load Video</button>
+        </div>
+    </div>
+
+    <!-- DashJS from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/dashjs@4.7.4/dist/dash.all.min.js"></script>
+    <script src="src/player.js"></script>
+</body>
+</html>
