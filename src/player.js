@@ -2,28 +2,8 @@
 const videoElement = document.getElementById('videoPlayer');
 const manifestInput = document.getElementById('manifestUrl');
 
-// Rules registry - Add new rules here to make them available
-const ABR_RULES = {
-    'custom': {
-        name: 'Custom Bitrate Rule',
-        factoryName: 'CustomBitrateRule',
-        factory: CustomBitrateRule
-    },
-    'lowest': {
-        name: 'Lowest Bitrate Rule',
-        factoryName: 'LowestBitrateRule',
-        factory: LowestBitrateRule
-    },
-    'highest': {
-        name: 'Highest Bitrate Rule',
-        factoryName: 'HighestBitrateRule',
-        factory: HighestBitrateRule
-    }
-};
-
 // Initialize DashJS player
 let player;
-let currentRule = 'custom'; // Track current rule (defaults to first rule in registry)
 let currentManifestUrl = '';
 
 function initializePlayer(manifestUrl) {
@@ -52,7 +32,9 @@ function initializePlayer(manifestUrl) {
 }
 
 function registerCurrentRule() {
-    // Get the rule configuration from registry
+    // Get current rule from ruleButtons module
+    const currentRule = window.getCurrentRule ? window.getCurrentRule() : 'custom';
+    const ABR_RULES = window.getABRRules ? window.getABRRules() : {};
     const ruleConfig = ABR_RULES[currentRule];
     
     if (!ruleConfig) {
@@ -60,110 +42,50 @@ function registerCurrentRule() {
         return;
     }
     
-    try {
-        // Register the rule using the factory from the registry
-        player.addABRCustomRule('qualitySwitchRules', ruleConfig.factoryName, ruleConfig.factory);
-        console.log('Registered', ruleConfig.factoryName);
-    } catch (e) {
-        console.error('Error registering ABR rule:', e);
-    }
-}
-
-function switchRule(ruleType) {
-    if (currentRule === ruleType) {
-        return; // Already using this rule
-    }
-    
-    // Validate rule exists
-    if (!ABR_RULES[ruleType]) {
-        console.error('Unknown rule type:', ruleType);
-        return;
-    }
-    
-    currentRule = ruleType;
-    
-    // Update button states 
-    const ruleButtons = document.querySelectorAll('.rule-btn');
-    ruleButtons.forEach(btn => {
-        btn.classList.remove('active');
-        if (btn.dataset.ruleType === ruleType) {
-            btn.classList.add('active');
+    if (ruleConfig.isCustom) {
+        // Register custom rule
+        try {
+            player.addABRCustomRule('qualitySwitchRules', ruleConfig.factoryName, ruleConfig.factory);
+            console.log('Registered custom rule:', ruleConfig.factoryName);
+        } catch (e) {
+            console.error('Error registering ABR rule:', e);
         }
-    });
-    
-    // Update current rule text
-    const currentRuleText = document.getElementById('currentRule');
-    const ruleConfig = ABR_RULES[ruleType];
-    currentRuleText.textContent = `Current: ${ruleConfig.name}`;
-    
-    // If player is already initialized, reinitialize with the new rule
-    if (player && currentManifestUrl) {
-        console.log('Switching to', ruleType, 'rule');
-        initializePlayer(currentManifestUrl);
+    } else {
+        // Default rule - handled in setupABRSettings
+        console.log('Using default rule:', ruleConfig.ruleName);
     }
 }
 
-function initializeRuleButtons() {
-    const ruleButtonsContainer = document.getElementById('ruleButtons');
-    if (!ruleButtonsContainer) {
-        console.error('Rule buttons container not found');
-        return;
-    }
-    
-    // Clear existing buttons
-    ruleButtonsContainer.innerHTML = '';
-    
-    // Get the first rule as default
-    const defaultRule = Object.keys(ABR_RULES)[0];
-    currentRule = defaultRule;
-    
-    // Create buttons for each rule
-    Object.entries(ABR_RULES).forEach(([ruleId, ruleConfig], index) => {
-        const button = document.createElement('button');
-        button.className = 'rule-btn';
-        button.id = `${ruleId}RuleBtn`;
-        button.dataset.ruleType = ruleId;
-        button.textContent = ruleConfig.name;
-        button.onclick = () => switchRule(ruleId);
-        
-        // Set first button as active by default
-        if (index === 0) {
-            button.classList.add('active');
-        }
-        
-        ruleButtonsContainer.appendChild(button);
-    });
-    
-    // Update current rule text
-    const currentRuleText = document.getElementById('currentRule');
-    if (currentRuleText) {
-        currentRuleText.textContent = `Current: ${ABR_RULES[defaultRule].name}`;
-    }
-}
-
-// Setup ABR settings
-// Disable all default ABR rules so custom rule takes precedence
+// Setup ABR settings based on current rule selection
 function setupCustomABR() {
+    // Get current rule from ruleButtons module
+    const currentRule = window.getCurrentRule ? window.getCurrentRule() : 'custom';
+    const ABR_RULES = window.getABRRules ? window.getABRRules() : {};
+    const ruleConfig = ABR_RULES[currentRule];
+    
+    // Default: all rules disabled
+    const rulesConfig = {
+        throughputRule: { active: false },
+        bolaRule: { active: false },
+        insufficientBufferRule: { active: false },
+        switchHistoryRule: { active: false },
+        droppedFramesRule: { active: false },
+        abandonRequestsRule: { active: false },
+        l2ARule: { active: false },
+        loLPRule: { active: false },
+    };
+    
+    // If using a default rule, enable only that rule
+    if (ruleConfig && !ruleConfig.isCustom && ruleConfig.ruleName) {
+        rulesConfig[ruleConfig.ruleName] = { active: true };
+        console.log('Enabling default rule:', ruleConfig.ruleName);
+    }
+    
     player.updateSettings({
         streaming: {
             abr: {
                 autoSwitchBitrate: { audio: false, video: true },
-                rules: {
-                    throughputRule: { active: false },
-                    bolaRule: { active: false },
-                    insufficientBufferRule: { active: false },
-                    switchHistoryRule: { active: false },
-                    droppedFramesRule: { active: false },
-                    abandonRequestsRule: { active: false },
-                    l2ARule: { active: false },
-                    loLPRule: { active: false },
-                },
-                enableSupplementalPropertyAdaptationSetSwitching: false
-            },
-            buffer: {
-                fastSwitchEnabled: false,
-                bufferTimeDefault: 30,
-                bufferTimeAtTopQuality: 45
+                rules: rulesConfig
             }
         }
     });
@@ -208,7 +130,19 @@ function loadVideo() {
 // Initialize rule buttons and auto-load video on page load
 window.addEventListener('DOMContentLoaded', function() {
     // Initialize rule buttons dynamically
-    initializeRuleButtons();
+    if (window.initializeRuleButtons) {
+        window.initializeRuleButtons();
+    }
+    
+    // Set up rule change callback to reinitialize player
+    if (window.setRuleChangeCallback) {
+        window.setRuleChangeCallback(function(ruleType) {
+            if (player && currentManifestUrl) {
+                console.log('Switching to', ruleType, 'rule');
+                initializePlayer(currentManifestUrl);
+            }
+        });
+    }
     
     // Auto-load the default video
     const defaultUrl = manifestInput.value;
@@ -216,6 +150,3 @@ window.addEventListener('DOMContentLoaded', function() {
         initializePlayer(defaultUrl);
     }
 });
-
-// Make functions available globally
-window.switchRule = switchRule;
