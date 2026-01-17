@@ -1,7 +1,7 @@
-var LowestBitrateRule;
+var HighestBitrateRule;
 
-// Always selects the lowest bitrate representation
-function LowestBitrateRule() {
+// Always selects the highest bitrate representation
+function HighestBitrateRule() {
     let factory = dashjs.FactoryMaker;
     let SwitchRequest = factory.getClassFactoryByName('SwitchRequest');
     let context = this.context;
@@ -19,10 +19,11 @@ function LowestBitrateRule() {
         const representations = abrController.getPossibleVoRepresentations(mediaInfo);
         const switchRequest = SwitchRequest(context).create();
 
-        // Always select the lowest bitrate (index 0)
+        // Always select the highest bitrate (last index)
         if (representations && representations.length > 0) {
-            switchRequest.representation = representations[0];
-            switchRequest.reason = 'lowest bitrate rule';
+            const highestIndex = representations.length - 1;
+            switchRequest.representation = representations[highestIndex];
+            switchRequest.reason = 'highest bitrate rule';
         }
 
         return switchRequest;
@@ -35,5 +36,5 @@ function LowestBitrateRule() {
     return instance;
 }
 
-LowestBitrateRule.__dashjs_factory_name = 'LowestBitrateRule';
-LowestBitrateRule = dashjs.FactoryMaker.getClassFactory(LowestBitrateRule);
+HighestBitrateRule.__dashjs_factory_name = 'HighestBitrateRule';
+HighestBitrateRule = dashjs.FactoryMaker.getClassFactory(HighestBitrateRule);

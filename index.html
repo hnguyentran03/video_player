@@ -15,11 +15,18 @@
                    value="https://dash.akamaized.net/akamai/bbb_30fps/bbb_30fps.mpd">
             <button onclick="loadVideo()">Load Video</button>
         </div>
+        <div class="abr-controls">
+            <h3>ABR Rule Selection</h3>
+            <div id="ruleButtons" class="rule-buttons">
+            </div>
+            <p id="currentRule" class="current-rule">Current: Loading...</p>
+        </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/dashjs@4.7.4/dist/dash.all.min.js"></script>
+    <script src="https://cdn.dashjs.org/latest/modern/umd/dash.all.min.js"></script>
     <script src="src/customAbr.js"></script>
     <script src="src/lowestBitrateRule.js"></script>
+    <script src="src/highestBitrateRule.js"></script>
     <script src="src/player.js"></script>
 </body>
 </html>

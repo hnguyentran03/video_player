@@ -30,7 +30,6 @@ function CustomBitrateRule() {
      * @returns SwitchRequest - contains the next representation
      */
     function getSwitchRequest(ruleCtx) {
-        console.log('getSwitchRequest');
         const mediaInfo = ruleCtx.getMediaInfo();
         
         // We limit the scope of this project to video streams
@@ -48,16 +47,13 @@ function CustomBitrateRule() {
             switchRequest.representation = representations[0];
             switchRequest.reason = 'startup';
             previousIndex = 0;
-            // console.log(`[customABR] switched to ${representations[0].bandwidth}bps because ${switchRequest.reason}`);
         } else {
             const { targetIndex, reason } = calculateTargetIndex(representations);
-            // console.log(`[customABR] targetIndex: ${targetIndex}, reason: ${reason}`);
     
             if (previousIndex !== targetIndex) { // only switch if the target index is different from the previous index
                 switchRequest.representation = representations[targetIndex];
                 switchRequest.reason = reason;
                 previousIndex = targetIndex;
-                console.log(`[customABR] switched to ${representations[targetIndex].bandwidth}bps because ${reason}`);
             }
         }
 
