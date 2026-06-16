@@ -1,6 +1,4 @@
-// Rule Buttons Management Module
-
-// Rules registry - Add new rules here to make them available
+//Add new rules here to make them available
 const ABR_RULES = {
     // Custom rules
     'custom': {
@@ -21,6 +19,7 @@ const ABR_RULES = {
         factory: HighestBitrateRule,
         isCustom: true
     },
+    
     // Default DashJS ABR rules
     'throughput': {
         name: 'Throughput',

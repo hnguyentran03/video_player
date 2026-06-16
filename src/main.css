@@ -89,3 +89,30 @@ button:hover {
     font-size: 14px;
     font-style: italic;
 }
+.speed-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+.speed-btn {
+    flex: 1;
+    padding: 12px 20px;
+    background: #6c757d;
+    color: white;
+    border: 2px solid transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s;
+    margin-left: 0;
+}
+.speed-btn:hover {
+    background: #5a6268;
+}
+.speed-btn.active {
+    background: #fd7e14;
+    border-color: #fd7e14;
+}
+.speed-btn.active:hover {
+    background: #e8690b;
+}

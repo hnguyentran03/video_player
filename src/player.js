@@ -108,9 +108,11 @@ function setupEventListeners() {
         console.log('Current ABR settings:', settings.streaming.abr);
     });
     
-    // Add event listener for quality changes to verify custom rule is working
+    // dash.js v5: event uses newRepresentation/oldRepresentation instead of newQuality/oldQuality
     player.on('qualityChangeRendered', function(e) {
-        console.log('Quality changed to:', e.newQuality, 'reason:', e.reason);
+        const oldBw = e.oldRepresentation?.bandwidth;
+        const newBw = e.newRepresentation?.bandwidth;
+        console.log(`Quality changed [${e.mediaType}]: ${oldBw} → ${newBw} bps`);
     });
 }
 

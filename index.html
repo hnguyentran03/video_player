@@ -21,6 +21,12 @@
             </div>
             <p id="currentRule" class="current-rule">Current: Loading...</p>
         </div>
+        <div class="abr-controls">
+            <h3>Network Speed (emulated)</h3>
+            <div id="speedButtons" class="speed-buttons">
+            </div>
+            <p class="current-rule">Throttles segment downloads so dash.js sees the capped bandwidth.</p>
+        </div>
     </div>
 
     <script src="https://cdn.dashjs.org/latest/modern/umd/dash.all.min.js"></script>
@@ -28,6 +34,7 @@
     <script src="src/lowestBitrateRule.js"></script>
     <script src="src/highestBitrateRule.js"></script>
     <script src="src/ruleButtons.js"></script>
+    <script src="src/networkThrottle.js"></script>
     <script src="src/player.js"></script>
 </body>
 </html>
