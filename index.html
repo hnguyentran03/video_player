@@ -25,6 +25,19 @@
             <h3>Network Speed (emulated)</h3>
             <div id="speedButtons" class="speed-buttons">
             </div>
+            <div class="variable-controls">
+                <label>Min <input type="number" id="variableMin" value="300" min="1"> kbps</label>
+                <label>Max <input type="number" id="variableMax" value="5000" min="1"> kbps</label>
+                <label>Volatility
+                    <select id="variableVolatility">
+                        <option value="low">Low</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </label>
+                <button id="variableToggle" class="speed-btn variable-toggle" onclick="toggleVariableMode()">Start Variable</button>
+            </div>
+            <p id="variableReadout" class="current-rule">Variable mode off.</p>
             <p class="current-rule">Throttles segment downloads so dash.js sees the capped bandwidth.</p>
         </div>
     </div>

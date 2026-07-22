@@ -116,3 +116,29 @@ button:hover {
 .speed-btn.active:hover {
     background: #e8690b;
 }
+.variable-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+.variable-controls label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #333;
+    font-size: 14px;
+}
+.variable-controls input[type="number"],
+.variable-controls select {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+.variable-controls input[type="number"] {
+    width: 80px;
+}
+.variable-toggle {
+    flex: 0 0 auto;
+}
