@@ -246,9 +246,50 @@ function drawChart() {
     }
 }
 
+function handleChartHover(event) {
+    const canvas = document.getElementById('metricsChart');
+    const rect = canvas.getBoundingClientRect();
+    const px = event.clientX - rect.left;
+    const plotX = CHART_MARGIN.left;
+    const plotW = rect.width - CHART_MARGIN.left - CHART_MARGIN.right;
+    if (plotW <= 0 || chartSamples.length === 0) return;
+
+    // Invert xAt(): fraction of the window → sample index (right edge = newest).
+    const frac = Math.min(1, Math.max(0, (px - plotX) / plotW));
+    const fromEnd = Math.round((1 - frac) * (CHART_MAX_SAMPLES - 1));
+    const index = chartSamples.length - 1 - fromEnd;
+    if (index < 0) { hideChartTooltip(); return; }
+
+    chartHoverIndex = index;
+    const s = chartSamples[index];
+    const ageSec = ((chartSamples.length - 1 - index) * CHART_SAMPLE_MS) / 1000;
+    const tooltip = document.getElementById('metricsTooltip');
+    tooltip.innerHTML = `<div style="color:#898781">${ageSec === 0 ? 'now' : `-${ageSec.toFixed(1)}s`}</div>` +
+        CHART_SERIES.map(({ key, label, fmt }) =>
+            `<div><span style="display:inline-block;width:10px;height:3px;border-radius:1.5px;` +
+            `background:${CHART_COLORS[key]};margin-right:6px;vertical-align:middle"></span>` +
+            `${label}: ${s[key] == null ? '—' : fmt(s[key])}</div>`
+        ).join('');
+    tooltip.style.display = 'block';
+    const flip = px > rect.width - 170;
+    tooltip.style.left = flip ? '' : `${px + 12}px`;
+    tooltip.style.right = flip ? `${rect.width - px + 12}px` : '';
+    tooltip.style.top = '14px';
+    drawChart();
+}
+
+function hideChartTooltip() {
+    chartHoverIndex = null;
+    document.getElementById('metricsTooltip').style.display = 'none';
+    drawChart();
+}
+
 window.addEventListener('DOMContentLoaded', () => {
     buildChartLegend();
     resizeChartCanvas();
     window.addEventListener('resize', resizeChartCanvas);
+    const canvas = document.getElementById('metricsChart');
+    canvas.addEventListener('mousemove', handleChartHover);
+    canvas.addEventListener('mouseleave', hideChartTooltip);
     setInterval(sampleMetrics, CHART_SAMPLE_MS);
 });
