@@ -23,6 +23,7 @@ const VOLATILITY_STEP_FRACTION = { low: 0.05, medium: 0.15, high: 0.35 };
 
 let variableTimer = null; // non-null while variable mode is running
 let variableKbps = 0;     // current position of the walk
+let appliedCapKbps = null; // last cap actually posted to the SW; null = unlimited
 
 function initNetworkThrottle() {
     const container = document.getElementById('speedButtons');
@@ -68,6 +69,7 @@ function setNetworkSpeed(presetId) {
     });
 
     const bytesPerSec = preset.kbps == null ? null : (preset.kbps * 1000) / 8;
+    appliedCapKbps = preset.kbps;
     const controller = navigator.serviceWorker.controller;
     if (controller) {
         controller.postMessage({ type: 'setCap', bytesPerSec });
@@ -124,6 +126,7 @@ function startVariableMode() {
 }
 
 function postVariableCap() {
+    appliedCapKbps = variableKbps;
     const controller = navigator.serviceWorker.controller;
     if (controller) {
         controller.postMessage({ type: 'setCap', bytesPerSec: (variableKbps * 1000) / 8 });
@@ -144,9 +147,14 @@ function stopVariableMode() {
     console.log('Variable bandwidth stopped');
 }
 
+function getCurrentCapKbps() {
+    return appliedCapKbps;
+}
+
 window.initNetworkThrottle = initNetworkThrottle;
 window.setNetworkSpeed = setNetworkSpeed;
 window.toggleVariableMode = toggleVariableMode;
 window.stopVariableMode = stopVariableMode;
+window.getCurrentCapKbps = getCurrentCapKbps;
 
 window.addEventListener('DOMContentLoaded', initNetworkThrottle);
