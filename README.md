@@ -4,9 +4,10 @@ A vanilla-JS, no-build MPEG-DASH video player for experimenting with **Adaptive 
 
 ## Features
 
-- **Plays any DASH manifest** — paste an `.mpd` URL and hit Load (defaults to the Big Buck Bunny test stream).
+- **Plays any DASH manifest** — paste an `.mpd` URL and hit Load (defaults to the Sintel test stream).
 - **Switchable ABR rules** — toggle between custom rules and dash.js built-ins live; switching tears down and rebuilds the player with the selected rule.
 - **Real network emulation** — a service worker meters segment download bytes to a capped rate, so dash.js's throughput estimate actually reflects the cap and the ABR rules respond for real.
+- **Live metrics chart** — a canvas strip chart samples throughput, the emulated cap, the playing bitrate, and buffer level every 500 ms over a rolling 60 s window, with quality-switch markers and a hover crosshair. The timeline stays continuous across rule switches.
 
 ## Getting started
 
@@ -30,6 +31,7 @@ This is a no-bundler project. dash.js is loaded from CDN (`dash.all.min.js`, pin
 | `src/highestBitrateRule.js` | `HighestBitrateRule` — always picks the highest quality |
 | `src/ruleButtons.js` | `ABR_RULES` registry + rule-selection UI |
 | `src/networkThrottle.js` | bandwidth-emulation UI; registers the service worker |
+| `src/metricsChart.js` | live canvas strip chart of ABR metrics |
 | `src/player.js` | creates the dash.js `MediaPlayer` and wires everything together |
 | `sw.js` (repo root) | service worker that throttles media-segment responses |
 
@@ -70,12 +72,3 @@ The named dash.js built-in is enabled in `player.updateSettings` and all others 
 1. Create `src/myRule.js` following the factory pattern in `src/customAbr.js` (define the function, set `.__dashjs_factory_name`, wrap with `dashjs.FactoryMaker.getClassFactory`).
 2. Add a `<script>` tag for it in `index.html` **before** `ruleButtons.js`.
 3. Add an entry to `ABR_RULES` in `src/ruleButtons.js` with `isCustom: true`, a `factoryName`, and `factory` pointing to the constructor.
-
-## Project notes
-
-- No tests, no lint, no build step.
-- dash.js v5 changed event payloads: `qualityChangeRendered` now carries `newRepresentation`/`oldRepresentation` objects (with `.bandwidth`), not the v4 `newQuality`/`oldQuality` integers.
-
-## License
-
-MIT
