@@ -1,191 +1,385 @@
+/* Broadcast-console theme. Each control panel's accent is the chart trace it
+   drives: monitor → throughput (blue), rule → playing bitrate (green),
+   network → cap (orange). Chart series colors validated for this surface. */
+
+:root {
+    --console: #0f1216;      /* page plane */
+    --panel: #181c23;        /* rack module surface */
+    --panel-2: #1f242e;      /* raised controls */
+    --edge: #2a303b;         /* hairlines */
+    --ink: #eef1f5;
+    --ink-dim: #98a1ad;
+    --ink-faint: #6b7482;
+    --trace-thr: #3987e5;
+    --trace-cap: #d95926;
+    --trace-play: #199e70;
+    --trace-buf: #c98500;
+    --font-display: "Big Shoulders", "Arial Narrow", sans-serif;
+    --font-ui: "IBM Plex Sans", system-ui, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+
+* {
+    box-sizing: border-box;
+}
+
 body {
-    font-family: Arial, sans-serif;
-    max-width: 1200px;
+    margin: 0;
+    background: var(--console);
+    color: var(--ink);
+    font-family: var(--font-ui);
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* SMPTE 75% color bars — the video engineer's test signal, worn as a masthead. */
+.smpte-strip {
+    height: 6px;
+    background: linear-gradient(to right,
+        #b4b4b4 0 14.28%,
+        #b4b410 0 28.57%,
+        #10b4b4 0 42.86%,
+        #10b410 0 57.14%,
+        #b410b4 0 71.43%,
+        #b41010 0 85.71%,
+        #1010b4 0 100%);
+}
+
+.bench {
+    max-width: 1240px;
     margin: 0 auto;
-    padding: 20px;
-    background-color: #f5f5f5;
+    padding: 28px 24px 48px;
 }
-.container {
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+
+.masthead {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
 }
-h1 {
-    color: #333;
+
+.masthead h1 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(30px, 4.5vw, 44px);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    line-height: 1;
 }
+
+.masthead-meta {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--ink-faint);
+    white-space: nowrap;
+}
+
+.masthead-sub {
+    margin: 8px 0 24px;
+    color: var(--ink-dim);
+    font-size: 14px;
+}
+
+/* --- Layout --- */
+
+.bench-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+    gap: 16px;
+}
+
+.rack {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 0;
+}
+
+.panel--telemetry {
+    grid-column: 1 / -1;
+}
+
+@media (max-width: 920px) {
+    .bench-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+    .panel--telemetry {
+        grid-column: auto;
+    }
+}
+
+/* --- Panels --- */
+
+.panel {
+    background: var(--panel);
+    border: 1px solid var(--edge);
+    border-radius: 6px;
+    padding: 16px;
+    min-width: 0;
+}
+
+.panel-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 14px;
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+}
+
+.panel-tick {
+    width: 4px;
+    height: 14px;
+    border-radius: 1px;
+    flex: 0 0 auto;
+}
+
+.tick-thr  { background: var(--trace-thr); }
+.tick-play { background: var(--trace-play); }
+.tick-cap  { background: var(--trace-cap); }
+.tick-all  {
+    background: linear-gradient(to bottom,
+        var(--trace-thr) 0 25%, var(--trace-cap) 0 50%,
+        var(--trace-play) 0 75%, var(--trace-buf) 0 100%);
+}
+
+.panel-note {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    text-transform: none;
+    color: var(--ink-faint);
+    border: 1px solid var(--edge);
+    border-radius: 3px;
+    padding: 1px 6px;
+}
+
+.panel-help {
+    margin: 10px 0 0;
+    font-size: 12px;
+    color: var(--ink-faint);
+}
+
+.readout {
+    margin: 12px 0 0;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--ink-dim);
+}
+
+/* --- Monitor --- */
+
+.panel--monitor {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Fills whatever height the rack column sets; black bg hides the letterbox. */
 video {
+    display: block;
     width: 100%;
-    max-width: 100%;
+    flex: 1;
+    min-height: 320px;
     background: #000;
     border-radius: 4px;
 }
+
 .controls {
-    margin-top: 20px;
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
 }
+
 input[type="text"] {
-    width: 70%;
-    padding: 10px;
-    border: 1px solid #ddd;
+    flex: 1;
+    min-width: 0;
+    padding: 9px 12px;
+    background: var(--console);
+    border: 1px solid var(--edge);
     border-radius: 4px;
-    font-size: 14px;
+    color: var(--ink-dim);
+    font-family: var(--font-mono);
+    font-size: 12px;
 }
-button {
-    padding: 10px 20px;
-    background: #007bff;
-    color: white;
-    border: none;
+
+input[type="text"]:focus {
+    color: var(--ink);
+}
+
+.load-btn {
+    padding: 9px 18px;
+    background: var(--panel-2);
+    border: 1px solid var(--edge);
     border-radius: 4px;
+    color: var(--ink);
+    font-family: var(--font-ui);
+    font-size: 13px;
+    font-weight: 500;
     cursor: pointer;
-    font-size: 14px;
-    margin-left: 10px;
+    white-space: nowrap;
 }
-button:hover {
-    background: #0056b3;
+
+.load-btn:hover {
+    border-color: var(--ink-faint);
 }
-.abr-controls {
-    margin-top: 20px;
-    padding: 15px;
-    background: #f8f9fa;
-    border-radius: 4px;
-    border: 1px solid #dee2e6;
-}
-.abr-controls h3 {
-    margin-top: 0;
-    margin-bottom: 15px;
-    color: #333;
-    font-size: 16px;
-}
+
+/* --- Control chips (rule + speed buttons share the shape) --- */
+
 .rule-buttons {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 10px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
+    gap: 8px;
 }
-.rule-btn {
-    flex: 1;
-    padding: 12px 20px;
-    background: #6c757d;
-    color: white;
-    border: 2px solid transparent;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: all 0.3s;
-    margin-left: 0;
-}
-.rule-btn:hover {
-    background: #5a6268;
-}
-.rule-btn.active {
-    background: #28a745;
-    border-color: #28a745;
-}
-.rule-btn.active:hover {
-    background: #218838;
-}
-.current-rule {
-    margin: 10px 0 0 0;
-    color: #666;
-    font-size: 14px;
-    font-style: italic;
-}
+
 .speed-buttons {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 10px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(86px, 1fr));
+    gap: 8px;
 }
+
+.rule-btn,
 .speed-btn {
-    flex: 1;
-    padding: 12px 20px;
-    background: #6c757d;
-    color: white;
-    border: 2px solid transparent;
+    padding: 9px 10px;
+    background: var(--panel-2);
+    border: 1px solid var(--edge);
     border-radius: 4px;
+    color: var(--ink-dim);
+    font-family: var(--font-ui);
+    font-size: 13px;
     cursor: pointer;
-    font-size: 14px;
-    transition: all 0.3s;
-    margin-left: 0;
+    transition: border-color 0.15s, background-color 0.15s, color 0.15s;
 }
+
+.rule-btn:hover,
 .speed-btn:hover {
-    background: #5a6268;
+    border-color: var(--ink-faint);
+    color: var(--ink);
 }
+
+.rule-btn.active {
+    background: color-mix(in srgb, var(--trace-play) 16%, var(--panel));
+    border-color: var(--trace-play);
+    color: var(--ink);
+}
+
 .speed-btn.active {
-    background: #fd7e14;
-    border-color: #fd7e14;
+    background: color-mix(in srgb, var(--trace-cap) 16%, var(--panel));
+    border-color: var(--trace-cap);
+    color: var(--ink);
 }
-.speed-btn.active:hover {
-    background: #e8690b;
-}
+
+/* --- Variable bandwidth controls --- */
+
 .variable-controls {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
+    gap: 8px 12px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--edge);
 }
+
 .variable-controls label {
     display: flex;
     align-items: center;
-    gap: 5px;
-    color: #333;
-    font-size: 14px;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--ink-dim);
 }
+
 .variable-controls input[type="number"],
 .variable-controls select {
-    padding: 8px;
-    border: 1px solid #ddd;
+    padding: 6px 8px;
+    background: var(--console);
+    border: 1px solid var(--edge);
     border-radius: 4px;
-    font-size: 14px;
+    color: var(--ink);
+    font-family: var(--font-mono);
+    font-size: 12px;
 }
+
 .variable-controls input[type="number"] {
-    width: 80px;
+    width: 72px;
 }
+
 .variable-toggle {
     flex: 0 0 auto;
+    margin-left: auto;
 }
+
+/* --- Telemetry --- */
+
 .chart-wrap {
     position: relative;
 }
+
 #metricsChart {
     display: block;
     width: 100%;
     height: 260px;
-    background: #ffffff;
-    border: 1px solid #e1e0d9;
-    border-radius: 4px;
 }
+
 .chart-legend {
     display: flex;
     flex-wrap: wrap;
-    gap: 4px 18px;
-    margin-top: 8px;
-    font-size: 13px;
-    color: #52514e;
+    gap: 4px 20px;
+    margin-bottom: 10px;
+    font-size: 12px;
+    color: var(--ink-dim);
 }
+
 .chart-legend .legend-item {
     display: flex;
     align-items: center;
     gap: 6px;
 }
+
 .chart-legend .legend-swatch {
     width: 14px;
     height: 3px;
     border-radius: 1.5px;
 }
+
 .chart-legend .legend-value {
-    color: #0b0b0b;
+    color: var(--ink);
+    font-family: var(--font-mono);
     font-variant-numeric: tabular-nums;
 }
+
 .chart-tooltip {
     display: none;
     position: absolute;
     pointer-events: none;
-    background: #ffffff;
-    border: 1px solid #e1e0d9;
+    background: var(--panel-2);
+    border: 1px solid var(--edge);
     border-radius: 4px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
     padding: 8px 10px;
-    font-size: 12px;
-    color: #0b0b0b;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--ink);
     white-space: nowrap;
     z-index: 10;
+}
+
+/* --- Quality floor --- */
+
+:focus-visible {
+    outline: 2px solid var(--trace-thr);
+    outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        transition: none !important;
+    }
 }

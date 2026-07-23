@@ -3,50 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DashJS Video Player</title>
+    <title>ABR Test Bench — MPEG-DASH</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 7 7'%3E%3Crect width='1' height='7' fill='%23b4b4b4'/%3E%3Crect x='1' width='1' height='7' fill='%23b4b410'/%3E%3Crect x='2' width='1' height='7' fill='%2310b4b4'/%3E%3Crect x='3' width='1' height='7' fill='%2310b410'/%3E%3Crect x='4' width='1' height='7' fill='%23b410b4'/%3E%3Crect x='5' width='1' height='7' fill='%23b41010'/%3E%3Crect x='6' width='1' height='7' fill='%231010b4'/%3E%3C/svg%3E">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="src/main.css">
 </head>
 <body>
-    <div class="container">
-        <h1>DashJS Video Player</h1>
-        <video id="videoPlayer" controls></video>
-        <div class="controls">
-            <input type="text" id="manifestUrl" placeholder="Enter DASH manifest URL" 
-                   value="https://bitmovin-a.akamaihd.net/content/sintel/sintel.mpd">
-            <button onclick="loadVideo()">Load Video</button>
-        </div>
-        <div class="abr-controls">
-            <h3>ABR Rule Selection</h3>
-            <div id="ruleButtons" class="rule-buttons">
+    <div class="smpte-strip" aria-hidden="true"></div>
+
+    <div class="bench">
+        <header class="masthead">
+            <h1>ABR Test Bench</h1>
+            <p class="masthead-meta">MPEG-DASH &middot; dash.js</p>
+        </header>
+        <p class="masthead-sub">Pick an adaptation rule, shape the network, watch the player react.</p>
+
+        <div class="bench-grid">
+            <section class="panel panel--monitor">
+                <h2 class="panel-label"><span class="panel-tick tick-thr"></span>Monitor</h2>
+                <video id="videoPlayer" controls></video>
+                <div class="controls">
+                    <input type="text" id="manifestUrl" placeholder="DASH manifest URL"
+                           value="https://bitmovin-a.akamaihd.net/content/sintel/sintel.mpd">
+                    <button class="load-btn" onclick="loadVideo()">Load stream</button>
+                </div>
+            </section>
+
+            <div class="rack">
+                <section class="panel panel--rule">
+                    <h2 class="panel-label"><span class="panel-tick tick-play"></span>Adaptation rule</h2>
+                    <div id="ruleButtons" class="rule-buttons">
+                    </div>
+                    <p id="currentRule" class="readout">Current: Loading...</p>
+                </section>
+
+                <section class="panel panel--network">
+                    <h2 class="panel-label"><span class="panel-tick tick-cap"></span>Network shaping <span class="panel-note">emulated</span></h2>
+                    <div id="speedButtons" class="speed-buttons">
+                    </div>
+                    <div class="variable-controls">
+                        <label>Min <input type="number" id="variableMin" value="300" min="1"> kbps</label>
+                        <label>Max <input type="number" id="variableMax" value="5000" min="1"> kbps</label>
+                        <label>Volatility
+                            <select id="variableVolatility">
+                                <option value="low">Low</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="high">High</option>
+                            </select>
+                        </label>
+                        <button id="variableToggle" class="speed-btn variable-toggle" onclick="toggleVariableMode()">Start Variable</button>
+                    </div>
+                    <p id="variableReadout" class="readout">Variable mode off.</p>
+                    <p class="panel-help">Downloads are metered by a service worker, so the player's own throughput estimate sees the cap.</p>
+                </section>
             </div>
-            <p id="currentRule" class="current-rule">Current: Loading...</p>
-        </div>
-        <div class="abr-controls">
-            <h3>Network Speed (emulated)</h3>
-            <div id="speedButtons" class="speed-buttons">
-            </div>
-            <div class="variable-controls">
-                <label>Min <input type="number" id="variableMin" value="300" min="1"> kbps</label>
-                <label>Max <input type="number" id="variableMax" value="5000" min="1"> kbps</label>
-                <label>Volatility
-                    <select id="variableVolatility">
-                        <option value="low">Low</option>
-                        <option value="medium" selected>Medium</option>
-                        <option value="high">High</option>
-                    </select>
-                </label>
-                <button id="variableToggle" class="speed-btn variable-toggle" onclick="toggleVariableMode()">Start Variable</button>
-            </div>
-            <p id="variableReadout" class="current-rule">Variable mode off.</p>
-            <p class="current-rule">Throttles segment downloads so dash.js sees the capped bandwidth.</p>
-        </div>
-        <div class="abr-controls">
-            <h3>ABR Metrics (last 60 s)</h3>
-            <div class="chart-wrap">
-                <canvas id="metricsChart"></canvas>
-                <div id="metricsTooltip" class="chart-tooltip"></div>
-            </div>
-            <div id="metricsLegend" class="chart-legend"></div>
+
+            <section class="panel panel--telemetry">
+                <h2 class="panel-label"><span class="panel-tick tick-all"></span>Telemetry <span class="panel-note">last 60 s</span></h2>
+                <div id="metricsLegend" class="chart-legend"></div>
+                <div class="chart-wrap">
+                    <canvas id="metricsChart"></canvas>
+                    <div id="metricsTooltip" class="chart-tooltip"></div>
+                </div>
+            </section>
         </div>
     </div>
 

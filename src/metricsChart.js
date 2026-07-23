@@ -9,16 +9,17 @@
 const CHART_SAMPLE_MS = 500;
 const CHART_MAX_SAMPLES = 120; // 60 s window
 
-// Validated categorical palette (slots 1-4) + chart chrome inks.
+// Validated categorical palette (slots 1-4, dark-surface steps) + chart chrome inks.
 const CHART_COLORS = {
-    thr:   '#2a78d6',
-    cap:   '#eb6834',
-    play:  '#1baf7a',
-    buf:   '#eda100',
-    grid:  '#e1e0d9',
-    axis:  '#c3c2b7',
-    label: '#898781',
-    ink:   '#0b0b0b',
+    thr:   '#3987e5',
+    cap:   '#d95926',
+    play:  '#199e70',
+    buf:   '#c98500',
+    grid:  '#232833',
+    axis:  '#39404d',
+    label: '#8b93a1',
+    ink:   '#eef1f5',
+    surface: '#181c23',
 };
 
 const CHART_SERIES = [
@@ -137,7 +138,7 @@ function drawChart() {
     const yRight = (v) => plot.y + plot.h * (1 - v / rightMax);
 
     // --- Grid + axis labels ---
-    ctx.font = '11px system-ui, -apple-system, "Segoe UI", sans-serif';
+    ctx.font = '11px "IBM Plex Mono", ui-monospace, monospace';
     ctx.lineWidth = 1;
     const DIVISIONS = 4;
     for (let d = 0; d <= DIVISIONS; d++) {
@@ -224,7 +225,7 @@ function drawChart() {
         ctx.stroke();
     }
 
-    // A dot (with a 2px white ring) on each sample where the playing bitrate changed.
+    // A dot (with a 2px surface-colored ring) on each sample where the playing bitrate changed.
     function drawSwitchDots(yScale) {
         let prev = null;
         for (let i = 0; i < chartSamples.length; i++) {
@@ -238,7 +239,7 @@ function drawChart() {
                 ctx.fillStyle = CHART_COLORS.play;
                 ctx.fill();
                 ctx.lineWidth = 2;
-                ctx.strokeStyle = '#ffffff';
+                ctx.strokeStyle = CHART_COLORS.surface;
                 ctx.stroke();
             }
             prev = v;
@@ -264,7 +265,7 @@ function handleChartHover(event) {
     const s = chartSamples[index];
     const ageSec = ((chartSamples.length - 1 - index) * CHART_SAMPLE_MS) / 1000;
     const tooltip = document.getElementById('metricsTooltip');
-    tooltip.innerHTML = `<div style="color:#898781">${ageSec === 0 ? 'now' : `-${ageSec.toFixed(1)}s`}</div>` +
+    tooltip.innerHTML = `<div style="color:${CHART_COLORS.label}">${ageSec === 0 ? 'now' : `-${ageSec.toFixed(1)}s`}</div>` +
         CHART_SERIES.map(({ key, label, fmt }) =>
             `<div><span style="display:inline-block;width:10px;height:3px;border-radius:1.5px;` +
             `background:${CHART_COLORS[key]};margin-right:6px;vertical-align:middle"></span>` +
