@@ -142,3 +142,50 @@ button:hover {
 .variable-toggle {
     flex: 0 0 auto;
 }
+.chart-wrap {
+    position: relative;
+}
+#metricsChart {
+    display: block;
+    width: 100%;
+    height: 260px;
+    background: #ffffff;
+    border: 1px solid #e1e0d9;
+    border-radius: 4px;
+}
+.chart-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 18px;
+    margin-top: 8px;
+    font-size: 13px;
+    color: #52514e;
+}
+.chart-legend .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.chart-legend .legend-swatch {
+    width: 14px;
+    height: 3px;
+    border-radius: 1.5px;
+}
+.chart-legend .legend-value {
+    color: #0b0b0b;
+    font-variant-numeric: tabular-nums;
+}
+.chart-tooltip {
+    display: none;
+    position: absolute;
+    pointer-events: none;
+    background: #ffffff;
+    border: 1px solid #e1e0d9;
+    border-radius: 4px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+    padding: 8px 10px;
+    font-size: 12px;
+    color: #0b0b0b;
+    white-space: nowrap;
+    z-index: 10;
+}

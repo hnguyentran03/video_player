@@ -40,6 +40,14 @@
             <p id="variableReadout" class="current-rule">Variable mode off.</p>
             <p class="current-rule">Throttles segment downloads so dash.js sees the capped bandwidth.</p>
         </div>
+        <div class="abr-controls">
+            <h3>ABR Metrics (last 60 s)</h3>
+            <div class="chart-wrap">
+                <canvas id="metricsChart"></canvas>
+                <div id="metricsTooltip" class="chart-tooltip"></div>
+            </div>
+            <div id="metricsLegend" class="chart-legend"></div>
+        </div>
     </div>
 
     <script src="https://cdn.dashjs.org/latest/modern/umd/dash.all.min.js"></script>
@@ -48,6 +56,7 @@
     <script src="src/highestBitrateRule.js"></script>
     <script src="src/ruleButtons.js"></script>
     <script src="src/networkThrottle.js"></script>
+    <script src="src/metricsChart.js"></script>
     <script src="src/player.js"></script>
 </body>
 </html>
